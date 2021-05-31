@@ -31,14 +31,13 @@ const addBook = (request, h) => {
     return response
   }
 
-  const id = nanoid(16)
+  const id = nanoid(9)
   const insertedAt = new Date().toISOString()
-  const updatedAt = insertedAt
-  const finished = (pageCount === readPage)
+  const finished = pageCount === readPage
   const newBook = {
     id,
     insertedAt,
-    updatedAt,
+    updatedAt: insertedAt,
     name,
     year,
     author,
@@ -81,25 +80,28 @@ const getAllBooks = (request, h) => {
     finished
   } = request.query
 
-  let searchAllBooks = books
+  let allBooks = books
 
+  // Parameter Query
   if (name !== undefined) {
-    searchAllBooks = searchAllBooks.filter((book) => book
+    allBooks = allBooks.filter((book) => book
       .name.toLowerCase().includes(name.toLowerCase()))
   }
 
   if (reading) {
-    searchAllBooks = searchAllBooks.filter((book) => book.reading === !!Number(reading))
+    allBooks = allBooks.filter((book) => book
+      .reading === !!Number(reading))
   }
 
   if (finished) {
-    searchAllBooks = searchAllBooks.filter((book) => book.finished === !!Number(finished))
+    allBooks = allBooks.filter((book) => book
+      .finished === !!Number(finished))
   }
 
   const response = h.response({
     status: 'success',
     data: {
-      books: searchAllBooks.map((book) => ({
+      books: allBooks.map((book) => ({
         id: book.id,
         name: book.name,
         publisher: book.publisher
